@@ -1,3 +1,5 @@
+import heapq
+
 grafo = {
     '0 - Florianópolis': {'1 - Joinville': 4, '7 - Chapecó': 8},
     '1 - Joinville': {'0 - Florianópolis': 4, '2 - Blumenau': 8, '7 - Chapecó': 11},
@@ -12,29 +14,21 @@ grafo = {
 
 def dijkstra(grafo, inicio):
     
-    nao_visitados = list(grafo.keys())
-    distancias = {}
-    for no in grafo:
-        distancias[no] = float('inf')
+    distancias = {no: float('inf') for no in grafo}
     distancias[inicio] = 0
-
-    while nao_visitados:
-        no_atual = None
-        for no in nao_visitados:
-            if no_atual is None:
-                no_atual = no
-            elif distancias[no] < distancias[no_atual]:
-                no_atual = no
-
-        if distancias[no_atual] == float('inf'):
-            break
+    prioridade = [(0, inicio)]
+    
+    while prioridade:
+        dist_atual, no_atual = heapq.heappop(prioridade)
+        
+        if dist_atual > distancias[no_atual]:
+            continue
 
         for vizinho, peso in grafo[no_atual].items():
-            nova_distancia = distancias[no_atual] + peso
+            nova_distancia = dist_atual + peso
             if nova_distancia < distancias[vizinho]:
                 distancias[vizinho] = nova_distancia
-
-        nao_visitados.remove(no_atual)
+                heapq.heappush(prioridade, (nova_distancia, vizinho))
 
     return distancias
 
